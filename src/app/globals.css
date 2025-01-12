@@ -1,0 +1,38 @@
+@import 'antd/dist/reset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #2E7D32;
+  --color-secondary: #4CAF50;
+  --color-accent: #81C784;
+  --color-background: #F5F5F5;
+}
+
+body {
+  background-color: var(--color-background);
+}
+
+.ant-btn-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.ant-progress-bg {
+  background-color: var(--color-primary) !important;
+}
+
+.upload-container .ant-upload-drag {
+  border: 2px dashed #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.upload-container .ant-upload-drag:hover {
+  border-color: var(--color-primary);
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+} 
