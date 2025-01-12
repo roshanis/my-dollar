@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MyDollar - Personal Finance Tracker
 
-## Getting Started
+A modern web application for managing personal finances, tracking expenses, and analyzing spending patterns. Built with Next.js, TypeScript, and SQLite.
 
-First, run the development server:
+![MyDollar Dashboard](public/dashboard-preview.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌟 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Transaction Management
+- 📤 Import transactions from CSV files
+- 🔍 Advanced search and filtering
+- 📊 Automatic categorization
+- 💳 Multi-bank support
+- 🔄 Duplicate detection
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Budget Tracking
+- 📅 Monthly budget planning
+- 📈 Real-time spending tracking
+- 🎯 Category-based budgets
+- ⚠️ Overspending alerts
+- 📊 Visual progress bars
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Analytics & Insights
+- 📊 Spending trends visualization
+- 🏪 Top merchant analysis
+- 📈 Income vs. Expenses
+- 🗓️ Monthly comparisons
+- 📱 Mobile-responsive design
 
-## Learn More
+## 🚀 Quick Start
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Git
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone the repository
+2. Run `npm install` to install dependencies
+3. Run `npm run dev` to start the development server
+4. Open [http://localhost:3000](http://localhost:3000)
 
-## Deploy on Vercel
+## 💻 Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Frontend
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **UI Components**: Ant Design
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Backend
+- **API**: Next.js API Routes
+- **Database**: SQLite
+- **File Processing**: csv-parse
+- **Data Validation**: TypeScript
+
+## 📁 Project Structure
+
+### Supported CSV Formats
+- American Express
+- Chase
+- Bank of America
+- Custom CSV (configurable)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+
+    
