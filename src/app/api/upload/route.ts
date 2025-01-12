@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
-import { CSVProcessor } from '@/services/csv_processor';
+import { parse } from 'csv-parse/sync';
 
 export async function POST(request: Request) {
+  let db = null;
+  
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
@@ -14,50 +16,108 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read file content
-    const csvContent = await file.text();
+    db = await getDb();
+    const text = await file.text();
     
-    // Process CSV
-    const processor = new CSVProcessor();
-    const transactions = processor.processCSV(csvContent);
+    // Parse CSV with proper handling of quotes and newlines
+    const records = parse(text, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+      relax_quotes: true,
+      relax_column_count: true
+    });
 
-    // Insert into database
-    const db = await getDb();
-    
-    for (const transaction of transactions) {
-      await db.run(`
-        INSERT INTO transactions (
-          date,
-          merchant,
+    console.log('Parsed records:', records.length);
+
+    let stats = {
+      total: records.length,
+      added: 0,
+      duplicates: 0,
+      errors: 0
+    };
+
+    await db.run('BEGIN TRANSACTION');
+
+    for (const record of records) {
+      try {
+        // Clean amount - remove any currency symbols and convert to number
+        const rawAmount = record.Amount?.replace(/[^0-9.-]/g, '') || '0';
+        const amount = parseFloat(rawAmount);
+
+        if (isNaN(amount)) {
+          console.log('Invalid amount:', record.Amount);
+          stats.errors++;
+          continue;
+        }
+
+        await db.run(`
+          INSERT INTO transactions (
+            date,
+            merchant,
+            amount,
+            details,
+            address,
+            city_state,
+            zip_code,
+            country,
+            reference,
+            category,
+            bank
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          record.Date || '',
+          record.Merchant || '',
           amount,
-          category,
-          bank_name
-        ) VALUES (?, ?, ?, ?, ?)
-      `, [
-        transaction.date,
-        transaction.merchant,
-        transaction.amount,
-        transaction.category || null,
-        transaction.bank || null
-      ]);
+          record['Extended Details'] || '',
+          record.Address || '',
+          record['City/State'] || '',
+          record['Zip Code'] || '',
+          record.Country || '',
+          record.Reference?.replace(/'/g, '') || '', // Remove single quotes
+          record.Category || '',
+          record.Bank || ''
+        ]);
+        
+        stats.added++;
+      } catch (error: any) {
+        console.error('Error processing record:', record, error);
+        if (error.code === 'SQLITE_CONSTRAINT') {
+          stats.duplicates++;
+        } else {
+          stats.errors++;
+        }
+      }
     }
 
-    return NextResponse.json({
+    await db.run('COMMIT');
+
+    return NextResponse.json({ 
       success: true,
-      message: `Processed ${transactions.length} transactions`
+      stats,
+      message: `Processed ${stats.total} transactions: ${stats.added} added, ${stats.duplicates} duplicates, ${stats.errors} errors`
     });
 
   } catch (error) {
     console.error('Upload error:', error);
+    if (db) {
+      try {
+        await db.run('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Rollback error:', rollbackError);
+      }
+    }
     return NextResponse.json(
-      { error: error.message || 'Failed to process upload' },
+      { error: 'Failed to process upload' },
       { status: 500 }
     );
   }
 }
 
+// Add route configuration
 export const config = {
   api: {
-    bodyParser: false, // Disable the default body parser
+    bodyParser: false,
   },
 }; 

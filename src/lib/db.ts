@@ -1,55 +1,60 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import path from 'path';
+import os from 'os';
 
 let db: any = null;
 
 async function getDb() {
   if (!db) {
-    db = await open({
-      filename: './database.sqlite',
-      driver: sqlite3.Database
-    });
-    
-    // Create tables if they don't exist
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS transactions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
-        merchant TEXT NOT NULL,
-        amount DECIMAL(10,2) NOT NULL,
-        category TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
+    try {
+      // Use temp directory for database
+      const dbPath = path.join(os.tmpdir(), 'finance-app.sqlite');
+      console.log('Database path:', dbPath);
 
-      CREATE TABLE IF NOT EXISTS budgets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        category TEXT UNIQUE NOT NULL,
-        budget_limit DECIMAL(10,2) NOT NULL,
-        color TEXT NOT NULL
-      );
+      // Create new database connection
+      db = await open({
+        filename: dbPath,
+        driver: sqlite3.Database
+      });
+      
+      // Test the connection
+      const result = await db.get('SELECT 1 as test');
+      console.log('Database connection test:', result);
 
-      CREATE TABLE IF NOT EXISTS user_settings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT,
-        currency TEXT DEFAULT 'USD',
-        email_notifications BOOLEAN DEFAULT 1,
-        budget_alerts BOOLEAN DEFAULT 1,
-        large_transaction_alerts BOOLEAN DEFAULT 0
-      );
+      // Create schema if not exists
+      await db.exec(`
+        CREATE TABLE IF NOT EXISTS transactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          date TEXT NOT NULL,
+          merchant TEXT NOT NULL,
+          amount DECIMAL(10,2) NOT NULL,
+          details TEXT,
+          address TEXT,
+          city_state TEXT,
+          zip_code TEXT,
+          country TEXT,
+          reference TEXT,
+          category TEXT,
+          bank TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
 
-      -- Insert default settings if not exists
-      INSERT OR IGNORE INTO user_settings (id, name, email) 
-      VALUES (1, 'Default User', 'user@example.com');
+        CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
+        CREATE INDEX IF NOT EXISTS idx_transactions_merchant ON transactions(merchant);
+      `);
 
-      -- Insert default budgets if not exists
-      INSERT OR IGNORE INTO budgets (category, budget_limit, color) VALUES 
-        ('Groceries', 500, '#0ac775'),
-        ('Entertainment', 200, '#ff6b6b'),
-        ('Transportation', 300, '#4a90e2'),
-        ('Shopping', 400, '#f7b731');
-    `);
+      // Verify table exists and has data
+      const count = await db.get('SELECT COUNT(*) as count FROM transactions');
+      console.log('Transaction count:', count);
+
+    } catch (error) {
+      console.error('Database initialization error:', error);
+      db = null;
+      throw error;
+    }
   }
+
   return db;
 }
 

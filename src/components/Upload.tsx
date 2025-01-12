@@ -1,76 +1,75 @@
+'use client';
 import React, { useState } from 'react';
-import { Upload, message } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
-
-const { Dragger } = Upload;
+import { Upload, Button, notification } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 const CSVUpload: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
-  const beforeUpload = (file: File) => {
-    const isCsv = file.type === 'text/csv' || file.name.endsWith('.csv');
-    if (!isCsv) {
-      message.error('Please upload a CSV file only!');
-    }
-    return isCsv;
-  };
-
   const handleUpload = async (options: any) => {
     const { file, onSuccess, onError } = options;
+    
     try {
       setLoading(true);
+      console.log('Starting upload for file:', file.name);
+      
       const formData = new FormData();
       formData.append('file', file);
-      
+
+      console.log('Sending request to server...');
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
       
+      // Log the raw response
+      console.log('Server response status:', response.status);
       const result = await response.json();
-      
+      console.log('Server response:', result);
+
       if (!response.ok) {
         throw new Error(result.error || 'Upload failed');
       }
-      
-      message.success(`${result.message}`);
+
       onSuccess(result);
+      window.dispatchEvent(new Event('transactionUploaded'));
       
-      // Trigger page refresh to show new transactions
-      window.location.reload();
-      
+      notification.success({
+        message: 'Upload Successful',
+        description: result.message || 'File uploaded successfully',
+        duration: 5,
+      });
     } catch (error) {
       console.error('Upload error:', error);
-      message.error(error.message || 'Upload failed');
       onError(error);
+      
+      notification.error({
+        message: 'Upload Failed',
+        description: error instanceof Error ? error.message : 'Failed to upload file',
+        duration: 5,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="upload-container max-w-2xl mx-auto">
-      <Dragger
-        name="file"
-        multiple={false}
-        beforeUpload={beforeUpload}
-        customRequest={handleUpload}
-        showUploadList={true}
-        disabled={loading}
-        className="bg-white p-6 rounded-lg shadow-sm border-2 border-dashed"
-      >
-        <p className="ant-upload-drag-icon">
-          <InboxOutlined className="text-4xl text-blue-500" />
-        </p>
-        <p className="ant-upload-text text-lg mt-4">
-          Click or drag CSV file to upload
-        </p>
-        <p className="ant-upload-hint text-gray-500 mt-2">
-          Supports CSV files from major banks and credit cards
-        </p>
-        {loading && <p className="text-blue-500 mt-2">Uploading...</p>}
-      </Dragger>
-    </div>
+    <Upload.Dragger
+      customRequest={handleUpload}
+      accept=".csv"
+      showUploadList={false}
+      disabled={loading}
+      multiple={false}
+    >
+      <p className="ant-upload-drag-icon">
+        <UploadOutlined />
+      </p>
+      <p className="ant-upload-text">Click or drag CSV file to upload</p>
+      <p className="ant-upload-hint">
+        File must be a CSV with columns: date, merchant, amount, category
+      </p>
+      {loading && <p>Uploading...</p>}
+    </Upload.Dragger>
   );
 };
 

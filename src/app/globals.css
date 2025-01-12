@@ -15,6 +15,36 @@ body {
   background-color: var(--color-background);
 }
 
+/* Navigation Menu Styles */
+.ant-menu {
+  color: white !important;
+  display: flex;
+  justify-content: center;
+}
+
+.ant-menu-item {
+  color: white !important;
+  padding: 0 24px !important;
+  margin: 0 4px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.ant-menu-item:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+.ant-menu-horizontal {
+  border-bottom: none !important;
+  line-height: 40px !important;
+}
+
 .ant-btn-primary {
   background-color: var(--color-primary) !important;
 }
@@ -31,8 +61,4 @@ body {
 
 .upload-container .ant-upload-drag:hover {
   border-color: var(--color-primary);
-}
-
-.ant-menu-item-selected {
-  background-color: rgba(255, 255, 255, 0.1) !important;
 } 

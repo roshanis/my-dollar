@@ -1,20 +1,30 @@
 'use client';
 import { Card, Row, Col, Progress, Button } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, ArrowDownOutlined, UploadOutlined } from '@ant-design/icons';
+import CSVUpload from '@/components/Upload';
 
 export default function Home() {
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Upload Section */}
+      <Row gutter={[16, 16]} className="mb-8">
+        <Col span={24}>
+          <Card title="Upload Transactions" className="shadow-sm">
+            <CSVUpload />
+          </Card>
+        </Col>
+      </Row>
+
       {/* Top Summary Cards */}
       <Row gutter={[16, 16]} className="mb-8">
         <Col xs={24} md={6}>
-          <Card className="bg-[#0ac775] text-white">
+          <Card className="bg-[#2E7D32] text-white">
             <div className="text-lg font-semibold mb-2">Cash</div>
             <div className="text-2xl">$2,450.35</div>
           </Card>
         </Col>
         <Col xs={24} md={6}>
-          <Card className="bg-[#ff6b6b]">
+          <Card className="bg-[#EF5350]">
             <div className="text-lg font-semibold mb-2 text-white">Credit</div>
             <div className="text-2xl text-white">-$523.45</div>
           </Card>

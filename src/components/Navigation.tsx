@@ -16,23 +16,16 @@ const Navigation = () => {
   const pathname = usePathname();
 
   return (
-    <div className="bg-[#2E7D32] text-white shadow-lg">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center py-3 px-4">
-          <div 
-            className="text-2xl font-bold text-white cursor-pointer flex items-center gap-2" 
-            onClick={() => router.push('/')}
-          >
-            <DollarLogo className="w-8 h-8" />
-            {APP_NAME}
-          </div>
+    <div>
+      {/* Top Menu */}
+      <div className="bg-[#2E7D32] text-white">
+        <div className="container mx-auto">
           <Menu
             mode="horizontal"
             selectedKeys={[pathname]}
             onClick={({ key }) => router.push(key)}
-            className="border-none bg-transparent"
+            className="border-none justify-center"
             style={{ 
-              color: 'white',
               backgroundColor: 'transparent',
             }}
             items={[
@@ -40,24 +33,50 @@ const Navigation = () => {
                 key: '/',
                 icon: <HomeOutlined />,
                 label: 'Overview',
+                className: 'text-white hover:text-white',
+                style: { color: 'white' }
               },
               {
                 key: '/transactions',
                 icon: <DollarOutlined />,
                 label: 'Transactions',
+                className: 'text-white hover:text-white',
+                style: { color: 'white' }
               },
               {
                 key: '/budgets',
                 icon: <PieChartOutlined />,
                 label: 'Budgets',
+                className: 'text-white hover:text-white',
+                style: { color: 'white' }
               },
               {
                 key: '/settings',
                 icon: <SettingOutlined />,
                 label: 'Settings',
+                className: 'text-white hover:text-white',
+                style: { color: 'white' }
               }
             ]}
           />
+        </div>
+      </div>
+
+      {/* Logo Bar */}
+      <div className="bg-white shadow-md">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center py-4 px-4">
+            <div 
+              className="text-2xl font-bold text-[#2E7D32] cursor-pointer flex items-center gap-2" 
+              onClick={() => router.push('/')}
+            >
+              <DollarLogo className="w-8 h-8" />
+              {APP_NAME}
+            </div>
+            <div className="text-sm text-gray-600">
+              Welcome to MyDollar
+            </div>
+          </div>
         </div>
       </div>
     </div>
